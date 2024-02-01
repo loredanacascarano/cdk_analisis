@@ -1,6 +1,6 @@
 library(readxl)
 
-db=read_excel("./db.xlsx")
+db=read_excel("/Users/loredanacascarano/Desktop/unicatt/data analisi/cdk_analisis/db.xlsx")
 View(db)
 
 ####elimino tutti i casi missing dal campione.
@@ -137,4 +137,60 @@ summary(m3)
 
 #al fine di compiere future e più approfondite analisi sarebbe utile in prima istanza escludere una delle due variabili tra albumina e sugar (in quanto strettamente correlate tra loro) e inserire
 #eventuali altre variabili esplicative socio-demografiche che potrebbero impattare o spiegare una differenza tra i soggetti (ex. genere, lvl di istruzione, reddito ecc ecc)
+# Caricamento delle librerie necessarie
+library(rpart)
+library(lattice)
+library(caret) # per la divisione dei dati e la valutazione del modello
+
+
+
+# Divisione in set di addestramento e test
+set.seed(123) # Per la riproducibilità
+splitIndex <- createDataPartition(db2$class, p = .8, list = FALSE)
+train_data <- db2[splitIndex,]
+test_data <- db2[-splitIndex,]
+
+# Costruzione del modello
+kidney_model <- rpart(class ~ ., data = train_data, method = "class")
+predictions <- predict(kidney_model, test_data, type = "class")
+
+# converto le predizioni e i valori reali in fattori, se necessario
+predictions <- factor(predictions, levels = levels(test_data$class))
+test_data$class <- factor(test_data$class)
+
+# Verifico che ora abbiano tutti gli stessi livelli
+all_levels <- union(levels(predictions), levels(test_data$class))
+
+# riassegno i livelli per assicurare la corrispondenza
+predictions <- factor(predictions, levels = all_levels)
+test_data$class <- factor(test_data$class, levels = all_levels)
+
+# calcolo la confusion matrix
+confusionMatrix(predictions, test_data$class)
+# Risultati della Matrice di Confusione e Statistiche
+#
+# La matrice di confusione mostra un'eccellente performance del modello:
+# - Predizioni per la classe 0: 24 corrette, 0 errate
+# - Predizioni per la classe 1: 7 corrette, 0 errate
+#
+# Statistiche chiave:
+# - Accuratezza: 1 (100% delle predizioni sono corrette)
+# - Intervallo di Confidenza al 95% per l'Accuratezza: da 0.8878 a 1
+# - No Information Rate: 0.7742
+# - P-Value per Accuratezza maggiore del No Information Rate: 0.0003584
+# - Kappa: 1 (indicando un accordo perfetto)
+# - Sensibilità (Rilevamento della classe positiva): 1.0000
+# - Specificità (Rilevamento della classe negativa): 1.0000
+# - Valore Predittivo Positivo: 1.0000
+# - Valore Predittivo Negativo: 1.0000
+# - Prevalenza della classe positiva nel set di test: 0.7742
+# - Rate di Rilevamento: 0.7742
+# - Prevalenza di Rilevamento: 0.7742
+# - Accuratezza Bilanciata: 1.0000
+#
+# La 'classe positiva' è stata considerata come 0 per questa analisi.
+#
+# Questi risultati indicano una performance perfetta del modello sul set di test, 
+# con il modello che riesce a classificare correttamente tutte le istanze senza errori.
+
 
