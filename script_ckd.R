@@ -1,6 +1,6 @@
 library(readxl)
 
-db=read_excel("/Users/loredanacascarano/Desktop/unicatt/data analisi/cdk_analisis/db.xlsx")
+db=read_excel("db.xlsx")
 View(db)
 
 ####elimino tutti i casi missing dal campione.
