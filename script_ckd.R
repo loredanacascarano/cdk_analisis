@@ -1,12 +1,12 @@
 library(readxl)
 
-db=read_excel("db.xlsx")
+db <- read_excel("db.xlsx")
 View(db)
 
 ####elimino tutti i casi missing dal campione.
 #utilizzo na.omit 
 
-db1=na.omit(db)
+db1 <- na.omit(db)
 
 View(db1)
 
@@ -34,7 +34,7 @@ table(db1$class)
 ####al fine di alleggerire il dataset per la computazione dei modelli tengo le variabili principali che sono di mio interesse
 
 
-db2=subset(db1,select= c(age,blood_pressure,albuin,sugar,class))
+db2 <- subset(db1, select= c(age, blood_pressure, albuin, sugar, class))
 
 
 #####prima di stimare il modello di regressione lineare controllo se esiste, e quanto è forte, la correlazione tra la variabile
@@ -44,7 +44,7 @@ db2=subset(db1,select= c(age,blood_pressure,albuin,sugar,class))
 #all'interno del mio dataset (db2)
 
 
-matricecorr = round(cor(db2), digits = 2)
+matricecorr <- round(cor(db2), digits = 2)
 matricecorr
 
 #la variabile dipendente class è correlata almeno allo 0.30 con tutte le altre variabili.
@@ -68,7 +68,7 @@ matricecorr
 #Considerando che l'albumina rappresenta la variabile indipendente con la maggiore correlazione rispetto alla variabile dipendente y nel mio dataset,
 #ho optato per priorizzare l'elaborazione e l'analisi del modello denominato con m0.
 
-m0=lm(db2$class~db2$albuin)
+m0 <- lm(db2$class~db2$albuin)
 summary(m0)
 
 # Inizialmente, l'analisi rivela che sia l'intercetta che il principale regressore, l'albumina, sono significativi,
@@ -85,7 +85,7 @@ summary(m0)
 
 #inserisco la seconda variabile di interesse (sugar)
 
-m1=lm(db2$class~db2$albuin+db2$sugar)
+m1 <- lm(db2$class~db2$albuin+db2$sugar)
 summary(m1)
 
 
@@ -97,7 +97,7 @@ summary(m1)
 #aggiungo nuovamente una terza variabile di controllo, come la pressione sanguigna (blood pressure)
 
 
-m2=lm(db2$class~db2$albuin+db2$sugar+db2$blood_pressure)
+m2 <- lm(db2$class~db2$albuin+db2$sugar+db2$blood_pressure)
 summary(m2)
 
 #anche in questo caso la variabile pressione sanguigna sembra non essere significativa all'interno della relazione analizzata, così come non sembra mutare l'indice di bontà del modello (adj-rsquare=)
@@ -106,7 +106,7 @@ summary(m2)
 
 #infine completo il modello comprensivo di tutte le nostre variabili, inserendo quindi la variabile età
 
-m3=lm(db2$class~db2$albuin+db2$sugar+db2$blood_pressure+db2$age)
+m3 <- lm(db2$class~db2$albuin+db2$sugar+db2$blood_pressure+db2$age)
 summary(m3)
 
 #l'inserimento della variabile età, che risulta significativa al 10%, migliora lievemente la capacità esplicativa del modello (r-square adj pari a 0.86)
